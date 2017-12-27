@@ -1,5 +1,6 @@
 package grails.buildtestdata
 
+import grails.gorm.validation.DefaultConstrainedProperty
 import groovy.util.logging.Slf4j
 
 import grails.buildtestdata.handler.ConstraintHandler
@@ -180,10 +181,20 @@ class DomainInstanceBuilder {
     void createMissingProperty(GormEntity domainInstance, String propertyName, ConstrainedProperty constrainedProperty, CircularCheckList circularCheckList) {
         log.debug("Creating missing property domain {}, propname {}", domainInstance?.class?.name, propertyName)
 
-        // First check if the default value satisfies the constraint
-        // we could handle this like any other constraint except transient properties appear to be
-        // non-nullable without actually having the nullable constraint
-        new NullableConstraintHandler().handle(domainInstance, propertyName, null, constrainedProperty, circularCheckList)
+        //check if there's example constraint, thn user its value.
+        if(constrainedProperty instanceof DefaultConstrainedProperty && ((DefaultConstrainedProperty)constrainedProperty).getMetaConstraintValue("example")) {
+            def exampleValue = ((DefaultConstrainedProperty)constrainedProperty).getMetaConstraintValue("example")
+            if(exampleValue) {
+                InvokerHelper.setProperty(domainInstance, propertyName, exampleValue)
+            }
+        }
+
+        else {
+            // First check if the default value satisfies the constraint
+            // we could handle this like any other constraint except transient properties appear to be
+            // non-nullable without actually having the nullable constraint
+            new NullableConstraintHandler().handle(domainInstance, propertyName, null, constrainedProperty, circularCheckList)
+        }
 
         if (getErrors(constrainedProperty, domainInstance, propertyName).errorCount && !createProperty(domainInstance, propertyName, constrainedProperty, circularCheckList)) {
             log.warn "Failed to generate a valid value for {}.{}", domainInstance?.class?.name, propertyName
