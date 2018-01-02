@@ -75,6 +75,10 @@ class NullableConstraintHandler extends AbstractConstraintHandler {
                 return new Date()
             case BigDecimal:
                 return new BigDecimal(0)
+            case float:
+                return 0.0
+            case Float:
+                return 0.0
             case java.time.LocalDateTime:
                 return java.time.LocalDateTime.now()
             case java.time.LocalDate:
@@ -89,6 +93,11 @@ class NullableConstraintHandler extends AbstractConstraintHandler {
             case Byte[]:
             case byte[]:
                 return [0xD, 0xE, 0xA, 0xD, 0xB, 0xE, 0xE, 0xF] as byte[]
+            case byte:
+            case Byte:
+                return 0 as byte
+            case Number:
+                return 0
             case Enum:
                 Collection values = constrainedProperty.propertyType.invokeMethod("values", null) as Collection
                 return values.first()

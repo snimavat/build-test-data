@@ -1,13 +1,13 @@
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 import org.junit.Test
-
+import grails.buildtestdata.TestDataBuilder
 @Rollback
 @Integration
-class DomainTestDataServiceBooleanTests implements DomainTestDataServiceBase {
+class DomainTestDataServiceBooleanTests implements DomainTestHelper, TestDataBuilder {
     @Test
     void testBooleanDefaultGroovyTruthFalseOk() {
-        def domainClass = createDomainClass("""
+        def domainClass = setUpDomainClass("""
             class TestDomain {
                 Long id
                 Long version
@@ -15,7 +15,7 @@ class DomainTestDataServiceBooleanTests implements DomainTestDataServiceBase {
             }
         """)
 
-        def domainObject = domainClass.build()
+        def domainObject = build(domainClass)
         assert domainObject != null
         assert domainObject.testProperty == false
     }

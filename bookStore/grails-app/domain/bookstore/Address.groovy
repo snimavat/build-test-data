@@ -1,4 +1,5 @@
 package bookstore
+
 class Address {
 
     String address1
